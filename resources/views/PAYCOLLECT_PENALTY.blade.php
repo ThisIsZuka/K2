@@ -183,7 +183,8 @@
                     },
                 }).then(function(response) {
                     $(".background_loading").css("display", "none");
-                    alert("Success")
+                    // alert("Success")
+                    alert(response.data.message)
                 })
                 .catch(function(error) {
                     $(".background_loading").css("display", "none");

@@ -30,9 +30,17 @@ class PAYCOLLECT_PENALTY extends BaseController
 
             $this->Update_SUM_AMT($GData['list']);
 
-            return true;
+            // return true;
+            return response()->json([
+                'Code' => '0000',
+                'message' => "Success",
+            ]);
         } catch (Exception $e) {
-            return $e->getMessage();
+            // return $e->getMessage();
+            return response()->json([
+                'Code' => '9000',
+                'message' => $e->getMessage(),
+            ]);
         }
     }
 

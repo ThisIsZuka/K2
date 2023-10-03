@@ -54,10 +54,18 @@ class Gen_CancelContract extends BaseController
 
             $this->update_customer_card($arr_contract);
 
-            return true;
+            // return true;
+            return response()->json([
+                'Code' => '0000',
+                'message' => "Success",
+            ]);
         } catch (Exception $e) {
 
-            return $e->getMessage();
+            // return $e->getMessage();
+            return response()->json([
+                'Code' => '9000',
+                'message' => $e->getMessage(),
+            ]);
         }
     }
 
@@ -233,6 +241,7 @@ class Gen_CancelContract extends BaseController
                 ->where('CONTRACT_NUMBER', $value['Contract_number'])
                 ->update([
                     'SUM_PAY_AMT' => $value['SUM_PAY_AMT'],
+                    'Install_PAY' => $value['Install_PAY'],
                     'Install_OD_01' => $value['Install_OD_01'],
                     'Install_OD_02' => $value['Install_OD_02'],
                     'Install_OD_Sum' => $value['Install_OD_Sum'],
