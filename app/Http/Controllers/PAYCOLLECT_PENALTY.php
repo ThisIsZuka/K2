@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Validator;
 
 use Illuminate\Validation\ValidationException;
 use stdClass;
+use App\Models\REPAYMENT;
 
 
 class PAYCOLLECT_PENALTY extends BaseController
@@ -41,6 +42,56 @@ class PAYCOLLECT_PENALTY extends BaseController
                 'Code' => '9000',
                 'message' => $e->getMessage(),
             ]);
+        }
+    }
+
+
+    function Update_PENALTY_COLLECT($list)
+    {
+        try {
+            DB::transaction(function () use ($list) {
+                foreach ($list as $value) {
+                    REPAYMENT::where('CONTRACT_NUMBER', $value['Contract_number'])
+                        ->where('INSTALL', $value['Install'])
+                        ->update([
+                            'PAY_PENALTY' => (int)$value['Penalty'],
+                            'PAY_COLLECT' => (int)$value['Paycollect'],
+                        ]);
+                }
+            });
+
+            DB::commit();
+
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+
+    function Update_SUM_AMT($list)
+    {
+        try {
+            
+            DB::transaction(function () use ($list) {
+
+                foreach ($list as $value) {
+                    $DB = REPAYMENT::select('PAY_COLLECT', 'PAY_PENALTY', 'PAY_AMT', 'PAY_VAT')
+                        ->where('CONTRACT_NUMBER', $value['Contract_number'])
+                        ->where('INSTALL', $value['Install'])
+                        ->first();
+                    // $SUM_AMOUNT = $DB->PAY_COLLECT + $DB->PAY_PENALTY + $DB->PAY_AMT + $DB->PAY_VAT;
+                    REPAYMENT::where('CONTRACT_NUMBER', $value['Contract_number'])
+                        ->where('INSTALL', $value['Install'])
+                        ->update([
+                            'PAY_SUM_AMT' => $DB->PAY_COLLECT + $DB->PAY_PENALTY + $DB->PAY_AMT + $DB->PAY_VAT,
+                        ]);
+                }
+            });
+
+            DB::commit();
+
+        } catch (Exception $e) {
+            return $e->getMessage();
         }
     }
 
@@ -115,47 +166,47 @@ class PAYCOLLECT_PENALTY extends BaseController
     }
 
 
-    function Update_PENALTY_COLLECT($list)
-    {
-        try {
-            foreach ($list as $value) {
+    // function Update_PENALTY_COLLECT($list)
+    // {
+    //     try {
+    //         foreach ($list as $value) {
 
-                DB::table('dbo.REPAYMENT')
-                    ->where('CONTRACT_NUMBER', $value['Contract_number'])
-                    ->where('INSTALL', $value['Install'])
-                    ->update([
-                        'PAY_PENALTY' => (int)$value['Penalty'],
-                        'PAY_COLLECT' => (int)$value['Paycollect'],
-                    ]);
-            }
-        } catch (Exception $e) {
-            return $e->getMessage();
-        }
-    }
+    //             DB::table('dbo.REPAYMENT')
+    //                 ->where('CONTRACT_NUMBER', $value['Contract_number'])
+    //                 ->where('INSTALL', $value['Install'])
+    //                 ->update([
+    //                     'PAY_PENALTY' => (int)$value['Penalty'],
+    //                     'PAY_COLLECT' => (int)$value['Paycollect'],
+    //                 ]);
+    //         }
+    //     } catch (Exception $e) {
+    //         return $e->getMessage();
+    //     }
+    // }
 
 
-    function Update_SUM_AMT($list)
-    {
-        try {
-            foreach ($list as $value) {
+    // function Update_SUM_AMT($list)
+    // {
+    //     try {
+    //         foreach ($list as $value) {
 
-                $DB = DB::table('REPAYMENT')
-                    ->select('CONTRACT_NUMBER', 'INSTALL', 'PAY_COLLECT', 'PAY_PENALTY', 'PAY_AMT', 'PAY_VAT', 'PAY_SUM_AMT')
-                    ->where('CONTRACT_NUMBER', $value['Contract_number'])
-                    ->where('INSTALL', $value['Install'])
-                    ->first();
+    //             $DB = DB::table('REPAYMENT')
+    //                 ->select('CONTRACT_NUMBER', 'INSTALL', 'PAY_COLLECT', 'PAY_PENALTY', 'PAY_AMT', 'PAY_VAT', 'PAY_SUM_AMT')
+    //                 ->where('CONTRACT_NUMBER', $value['Contract_number'])
+    //                 ->where('INSTALL', $value['Install'])
+    //                 ->first();
 
-                // $SUM_AMOUNT = $DB->PAY_COLLECT + $DB->PAY_PENALTY + $DB->PAY_AMT + $DB->PAY_VAT;
+    //             // $SUM_AMOUNT = $DB->PAY_COLLECT + $DB->PAY_PENALTY + $DB->PAY_AMT + $DB->PAY_VAT;
 
-                DB::table('dbo.REPAYMENT')
-                    ->where('CONTRACT_NUMBER', $value['Contract_number'])
-                    ->where('INSTALL', $value['Install'])
-                    ->update([
-                        'PAY_SUM_AMT' => $DB->PAY_COLLECT + $DB->PAY_PENALTY + $DB->PAY_AMT + $DB->PAY_VAT,
-                    ]);
-            }
-        } catch (Exception $e) {
-            return $e->getMessage();
-        }
-    }
+    //             DB::table('dbo.REPAYMENT')
+    //                 ->where('CONTRACT_NUMBER', $value['Contract_number'])
+    //                 ->where('INSTALL', $value['Install'])
+    //                 ->update([
+    //                     'PAY_SUM_AMT' => $DB->PAY_COLLECT + $DB->PAY_PENALTY + $DB->PAY_AMT + $DB->PAY_VAT,
+    //                 ]);
+    //         }
+    //     } catch (Exception $e) {
+    //         return $e->getMessage();
+    //     }
+    // }
 }
